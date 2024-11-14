@@ -3,10 +3,13 @@ from google.analytics.data_v1beta.types import DateRange, Metric, Dimension, Run
 import pandas as pd
 import streamlit as st
 
+
 # Initialize GA4 Client
 def initialize_ga4_client():
-    client = BetaAnalyticsDataClient.from_service_account_json(st.secrets["GA4_API_KEY"])
+    credentials = service_account.Credentials.from_service_account_info(st.secrets["GA4_API_KEY"])
+    client = BetaAnalyticsDataClient(credentials=credentials)
     return client
+
 
 # Fetch data from GA4
 def fetch_ga4_data(client, property_id, start_date, end_date):
