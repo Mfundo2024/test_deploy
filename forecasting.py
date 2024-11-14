@@ -1,27 +1,19 @@
-import streamlit as st
-from ga4_data import get_ga4_data
-from fbprophet import Prophet
+from statsmodels.tsa.arima.model import ARIMA
+from prophet import Prophet
 import pandas as pd
 
-def forecast_data():
-    # Load data for forecasting
-    ga4_data_df = get_ga4_data()
-    
-    # Prepare data for Prophet
-    df = ga4_data_df.rename(columns={"date": "ds", "totalUsers": "y"})
-    df["ds"] = pd.to_datetime(df["ds"])  # Prophet requires datetime format
+# ARIMA Model
+def arima_forecast(data, kpi, periods):
+    model = ARIMA(data[kpi], order=(5, 1, 0))  # Adjust ARIMA order based on performance
+    model_fit = model.fit()
+    forecast = model_fit.forecast(steps=periods)
+    return forecast
 
-    # Initialize and fit the model
+# Prophet Model
+def prophet_forecast(data, kpi, periods):
+    df = data[['date', kpi]].rename(columns={'date': 'ds', kpi: 'y'})
     model = Prophet()
     model.fit(df)
-
-    # Make future predictions
-    future = model.make_future_dataframe(periods=30)
+    future = model.make_future_dataframe(periods=periods)
     forecast = model.predict(future)
-    
-    st.subheader("Forecasted Users for Next 30 Days")
-    st.write(forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']])
-
-# Run forecasting if executed as main
-if __name__ == "__main__":
-    forecast_data()
+    return forecast[['ds', 'yhat']].tail(periods)
