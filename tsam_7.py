@@ -25,7 +25,7 @@ def main():
 
     # Date inputs
     start_date = st.date_input("Select start date for historical data", value=pd.to_datetime('2022-01-01'))
-    end_date = st.date_input("Select end date for historical data", value=pd.to_datetime('2024-09-30'))
+    end_date = st.date_input("Select end date for historical data", value=pd.to_datetime('2024-12-31'))
 
     # Load historical data from GA4
     st.write("Fetching data from GA4...")
