@@ -1,7 +1,7 @@
 from openai import OpenAI
 import pandas as pd
 
-client = INSIGHTS_API_KEY
+client = OpenAI(api_key=INSIGHTS_API_KEY)
 
 # Define KPI targets, thresholds, and challenges
 KPI_BENCHMARKS = {
