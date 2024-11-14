@@ -1,18 +1,13 @@
-from statsmodels.tsa.arima.model import ARIMA
-from prophet import Prophet
+import streamlit as st
 
-# ARIMA Model
-def arima_forecast(data, kpi, periods):
-    model = ARIMA(data[kpi], order=(5,1,0))  # Adjust ARIMA order based on performance
-    model_fit = model.fit()
-    forecast = model_fit.forecast(steps=periods)
-    return forecast
+# Access GA4 Property ID from Streamlit secrets
+ga4_property_id = st.secrets["GA4_PROPERTY_ID"]
 
-# Prophet Model
-def prophet_forecast(data, kpi, periods):
-    df = data[['date', kpi]].rename(columns={'date': 'ds', kpi: 'y'})
-    model = Prophet()
-    model.fit(df)
-    future = model.make_future_dataframe(periods=periods)
-    forecast = model.predict(future)
-    return forecast[['ds', 'yhat']].tail(periods)
+def forecast_data():
+    # Sample function using GA4 property ID for forecasting
+    st.write(f"Forecasting data for GA4 Property ID: {ga4_property_id}")
+    # Implement forecasting logic here
+
+# Run forecasting if executed as main
+if __name__ == "__main__":
+    forecast_data()
