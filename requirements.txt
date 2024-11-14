@@ -4,5 +4,5 @@ numpy==1.26.4
 plotly==5.23.0
 prophet==1.1.5
 statsmodels==0.14.2
-openai==1.45.0
+openai==0.28
 google-analytics-data==0.18.11
