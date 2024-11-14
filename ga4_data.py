@@ -1,5 +1,6 @@
 from google.analytics.data_v1beta import BetaAnalyticsDataClient
 from google.analytics.data_v1beta.types import DateRange, Metric, Dimension, RunReportRequest
+from google.oauth2 import service_account
 import pandas as pd
 import streamlit as st
 
