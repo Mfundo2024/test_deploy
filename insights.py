@@ -1,7 +1,6 @@
-from openai import OpenAI
+import openai
 import pandas as pd
-
-client = OpenAI(api_key=INSIGHTS_API_KEY)
+import streamlit as st
 
 # Define KPI targets, thresholds, and challenges
 KPI_BENCHMARKS = {
@@ -11,21 +10,17 @@ KPI_BENCHMARKS = {
     "Bounce Rate": {"threshold": 60, "target": 50, "challenge": 35},  # In percentages
 }
 
-
 # Function to get the last month's date range
 def get_last_month_range():
-    # Get today's date
     today = pd.Timestamp.today()
-
-    # Calculate the first and last day of the previous month
     first_day_last_month = today.replace(day=1) - pd.DateOffset(months=1)
     last_day_last_month = today.replace(day=1) - pd.DateOffset(days=1)
-
     return first_day_last_month, last_day_last_month
 
 # Function to call OpenAI for insights using chat-based models
 def generate_openai_insights(historical_data, forecast_data, kpi, target_last_month, target_this_month):
-      # Replace with your OpenAI API Key
+    openai.api_key = st.secrets["INSIGHTS_API_KEY"]
+
     # Get the last month's date range
     first_day_last_month, last_day_last_month = get_last_month_range()
 
@@ -76,10 +71,12 @@ def generate_openai_insights(historical_data, forecast_data, kpi, target_last_mo
     ]
 
     # Use OpenAI's ChatCompletion API for GPT-4
-    response = client.chat.completions.create(model="gpt-4",  # GPT-4 model for chat completions
-    messages=messages,
-    max_tokens=500,  # Max tokens for the response
-    temperature=0.7)
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=messages,
+        max_tokens=500,
+        temperature=0.7
+    )
 
     # Return the assistant's message
     return response.choices[0].message.content
