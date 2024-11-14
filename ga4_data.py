@@ -1,35 +1,47 @@
-from google.analytics.data_v1beta import BetaAnalyticsDataClient
-from google.analytics.data_v1beta.types import DateRange, Metric, Dimension, RunReportRequest
+import streamlit as st
 import pandas as pd
+from google.oauth2 import service_account
+from google.analytics.data_v1beta import BetaAnalyticsDataClient
+from google.analytics.data_v1beta.types import RunReportRequest, DateRange, Dimension, Metric
 
-# Initialize GA4 Client
-def initialize_ga4_client():
-    # Replace with your service account key path
-    client = BetaAnalyticsDataClient.from_service_account_json(GA4_API_KEY)
-    return client
+# Load Google service account credentials and GA4 Property ID from secrets
+credentials_info = st.secrets["google_service_account"]
+credentials = service_account.Credentials.from_service_account_info(credentials_info)
+client = BetaAnalyticsDataClient(credentials=credentials)
+ga4_property_id = st.secrets["GA4_PROPERTY_ID"]
 
-# Fetch data from GA4
-def fetch_ga4_data(client, property_id, start_date, end_date):
+def get_ga4_data():
+    # Define the request to GA4 API
     request = RunReportRequest(
-        property=f"properties/{property_id}",
+        property=f"properties/{ga4_property_id}",
         dimensions=[Dimension(name="date")],
         metrics=[
-            Metric(name="sessions"),
             Metric(name="activeUsers"),
-            Metric(name="userEngagementDuration"),
+            Metric(name="sessions"),
             Metric(name="bounceRate")
         ],
-        date_ranges=[DateRange(start_date=start_date, end_date=end_date)]
+        date_ranges=[DateRange(start_date="2024-01-01", end_date="2024-01-30")]
     )
 
+    # Run the request
     response = client.run_report(request)
-    data = []
+
+    # Parse and display results
+    rows = []
     for row in response.rows:
-        data.append({
+        data = {
             "date": row.dimension_values[0].value,
-            "sessions": float(row.metric_values[0].value),
-            "users": float(row.metric_values[1].value),
-            "userEngagementDuration": float(row.metric_values[2].value),
-            "bounce_rate": float(row.metric_values[3].value)
-        })
-    return pd.DataFrame(data)
+            "activeUsers": row.metric_values[0].value,
+            "sessions": row.metric_values[1].value,
+            "bounceRate": row.metric_values[2].value
+        }
+        rows.append(data)
+    
+    # Convert to DataFrame for easier analysis and display
+    df = pd.DataFrame(rows)
+    return df
+
+# Run data retrieval if executed as main
+if __name__ == "__main__":
+    df = get_ga4_data()
+    st.write("GA4 Data:", df)
